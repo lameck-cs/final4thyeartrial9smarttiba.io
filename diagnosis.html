@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Tiba Kenya - Botanical Scanner</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/png" href="logo.png">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+</head>
+<body>
+
+<header>
+    <img src="logo.png" alt="Smart Tiba Kenya Logo" id="logo">
+    <h1>Smart Tiba Kenya</h1>
+</header>
+
+<nav id="mainNav">
+    <a href="index.html" id="navHome">Home</a>
+    <a href="diagnosis.html" id="navScanner">Botanical Scanner</a>
+    <a href="risk.html" id="navGuide">Cultivation Guide</a>
+    <a href="support.html" id="navSupport">Help & Support</a>
+</nav>
+
+<script>
+    const currentPath = window.location.pathname;
+    if (currentPath.includes('diagnosis.html')) {
+        document.getElementById('navScanner').style.display = 'none';
+    }
+
+    fetch('/api/current_user').then(res => res.json()).then(data => {
+        if(data.logged_in) {
+            const nav = document.getElementById('mainNav');
+            const userText = document.createElement('span');
+            userText.style.color = '#e0ffe0';
+            userText.style.marginLeft = 'auto';
+            userText.style.marginRight = '20px';
+            userText.style.fontWeight = 'bold';
+            userText.innerText = '👤 Welcome, ' + data.username;
+            
+            const logoutBtn = document.createElement('a');
+            logoutBtn.href = '#';
+            logoutBtn.innerText = 'Logout';
+            logoutBtn.onclick = (e) => {
+                e.preventDefault();
+                fetch('/api/logout', {method: 'POST'}).then(() => window.location.href = 'login.html');
+            };
+            nav.appendChild(userText);
+            nav.appendChild(logoutBtn);
+        } else {
+            window.location.href = 'login.html';
+        }
+    });
+</script>
+
+<div class="diagnosis-container">
+    <div class="left-column">
+        
+        <div style="margin-bottom:20px; border-bottom:1px solid #ddd; padding-bottom:15px;">
+            <h3>Ethnobotanical Text Search</h3>
+            <label>Search by Plant Name (e.g., Blackjack, Neem):</label>
+            <div style="display:flex; gap:5px; margin-bottom:10px; margin-top:5px;">
+                <input type="text" id="plantTextSearch" placeholder="Type plant name..." style="flex:3;">
+                <button id="searchPlantBtn" style="flex:1; background:#1b5e20;">Find Herb 🔎</button>
+            </div>
+            
+            <label>Find cures for a Disease (e.g., Blood pressure):</label>
+            <div style="display:flex; gap:5px; margin-top:5px;">
+                <input type="text" id="diseaseTextSearch" placeholder="Enter condition..." style="flex:3;">
+                <button id="searchDiseaseBtn" style="flex:1; background:#c62828;">Find Cure 🩺</button>
+            </div>
+        </div>
+        
+        <h3>Or Upload/Capture Plant Image</h3>
+        <p style="font-size:0.9em; color:#666; margin-top:0;">(Fall back to Gemini AI if DB Cache misses)</p>
+        <input type="file" id="imageInput" accept="image/*">
+        <div style="display: flex; gap: 10px; width: 100%;">
+            <button id="cameraBtn" style="flex: 1;">Use Camera</button>
+            <button id="stopCameraBtn" style="flex: 1; background-color: #c0392b; display: none;">Stop Camera</button>
+        </div>
+        <video id="camera" style="display:none;" autoplay playsinline></video>
+        <canvas id="canvas" style="display:none;"></canvas>
+        <img id="preview" src="" alt="Plant Preview" style="display:none;">
+        <button id="identifyBtn" style="width:100%; margin-top:15px; background-color: #558b2f;">Analyze Medicinal Properties (Camera)</button>
+    </div>
+
+    <div class="right-column">
+        <h3>Analysis Result / Recommendations</h3>
+        <div id="loadingIndicator" style="display:none; text-align:center; padding:30px;">
+            <p>🌿 🚀 Analyzing... (Using local cache first, then cloud)</p>
+        </div>
+        
+        <div id="resultsContent">
+             <div style="text-align:center; padding:30px; border:2px dashed #ccc; border-radius:8px; color:#aaa;">
+                <p>🌿 Scan an image or type a name to get an ethnobotanical profile.</p>
+                <p>🩺 Enter a disease to get suggested Kenyan remedies.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer>
+    &copy; 2026 Smart Tiba Kenya
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>

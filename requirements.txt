@@ -1,0 +1,11 @@
+flask
+flask-cors
+werkzeug
+requests
+numpy
+opencv-python-headless
+wikipedia
+beautifulsoup4
+google-genai
+gunicorn
+python-dotenv

@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Tiba Kenya - Help & Support</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/png" href="logo.png">
+    <style>
+        .chat-container { border: 2px solid #a5d6a7; border-radius: 8px; padding: 15px; background: #f0fff0; height: 450px; display: flex; flex-direction: column; }
+        .chat-box { flex: 1; overflow-y: auto; padding-right: 10px; display: flex; flex-direction: column; gap: 10px; }
+        .bot-msg { background: white; color: #1b5e20; padding: 10px 15px; border-radius: 15px 15px 15px 0; align-self: flex-start; max-width: 85%; border: 1px solid #c8e6c9; box-shadow: 0 2px 4px rgba(0,0,0,0.05); line-height: 1.4; }
+        .user-msg { background: #1b5e20; color: white; padding: 10px 15px; border-radius: 15px 15px 0 15px; align-self: flex-end; max-width: 85%; box-shadow: 0 2px 4px rgba(0,0,0,0.05); line-height: 1.4; }
+        .contact-box { background: white; padding: 20px; border-radius: 8px; border-left: 5px solid #2e7d32; box-shadow: 0 2px 8px rgba(0,0,0,0.05); margin-bottom: 20px;}
+    </style>
+</head>
+<body>
+
+<header>
+    <img src="logo.png" alt="Smart Tiba Kenya Logo" id="logo">
+    <h1>Smart Tiba Kenya</h1>
+</header>
+
+<nav id="mainNav">
+    <a href="index.html" id="navHome">Home</a>
+    <a href="diagnosis.html" id="navScanner">Botanical Scanner</a>
+    <a href="risk.html" id="navGuide">Cultivation Guide</a>
+    <a href="support.html" id="navSupport">Help & Support</a>
+</nav>
+
+<script>
+    // Hide the link for the page we are currently viewing
+    const currentPath = window.location.pathname;
+    if (currentPath.includes('support.html')) {
+        document.getElementById('navSupport').style.display = 'none';
+    }
+
+    // Enforce session and render user info
+    fetch('/api/current_user').then(res => res.json()).then(data => {
+        if(data.logged_in) {
+            const nav = document.getElementById('mainNav');
+            const userText = document.createElement('span');
+            userText.style.color = '#e0ffe0';
+            userText.style.marginLeft = 'auto';
+            userText.style.marginRight = '20px';
+            userText.style.fontWeight = 'bold';
+            userText.innerText = '👤 Welcome, ' + data.username;
+            
+            const logoutBtn = document.createElement('a');
+            logoutBtn.href = '#';
+            logoutBtn.innerText = 'Logout';
+            logoutBtn.onclick = (e) => {
+                e.preventDefault();
+                fetch('/api/logout', {method: 'POST'}).then(() => window.location.href = 'login.html');
+            };
+            nav.appendChild(userText);
+            nav.appendChild(logoutBtn);
+        } else {
+            window.location.href = 'login.html';
+        }
+    });
+</script>
+
+<div class="diagnosis-container">
+    <div class="left-column">
+        <h2 style="color: #1b5e20; margin-top: 0;">24/7 Help & Support</h2>
+        <p>If you have any questions or require urgent assistance with the Smart Tiba Kenya platform, please reach out to us directly.</p>
+        
+        <div class="contact-box">
+            <h3 style="margin-top: 0; color: #2e7d32;">📞 Contact Information</h3>
+            <p><strong>Email:</strong> <a href="mailto:lameck.cs16@gmail.com" style="color: #1565c0;">lameck.cs16@gmail.com</a></p>
+            <p><strong>Phone:</strong> +254 725 713 859</p>
+            <p style="color: #e67e22; font-weight: bold; margin-bottom: 0;">⏱️ 24 Hour Support on the clock</p>
+        </div>
+
+        <div class="contact-box">
+            <h3 style="margin-top: 0; color: #2e7d32;">❓ Frequently Asked Questions</h3>
+            <p><strong>Q: How do I scan a plant?</strong><br>A: Go to the Botanical Scanner page, click 'Use Camera', take a photo of the leaves, and click 'Analyze'.</p>
+            <p><strong>Q: Is this information scientifically accurate?</strong><br>A: Yes! Smart Tiba Kenya cross-references traditional uses with modern pharmacognosy data to ensure safety and accuracy.</p>
+            <p><strong>Q: How do I reset my password?</strong><br>A: Send an email to our 24/7 support address with your username to request a manual password reset.</p>
+        </div>
+    </div>
+
+    <div class="right-column">
+        <h3 style="margin-top: 0;">Smart Tiba AI Assistant</h3>
+        <p style="font-size: 0.9em; color: #555;">Type a question below. If I don't know the answer, I will ask our main AI server!</p>
+        
+        <div class="chat-container">
+            <div id="chatBox" class="chat-box">
+                <div class="bot-msg">🌿 Hello! I am the Smart Tiba Support Bot. How can I help you today?</div>
+            </div>
+            <div style="display:flex; margin-top:15px; gap:5px;">
+                <input type="text" id="chatInput" placeholder="Ask a question..." style="flex:4; margin:0; padding:10px; border: 1px solid #ccc; border-radius:5px;">
+                <button id="sendBtn" style="flex:1; margin:0; padding:10px; border-radius:5px; background: #2e7d32; color: white; font-weight: bold; border: none; cursor: pointer;">Send</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const chatInput = document.getElementById('chatInput');
+    const sendBtn = document.getElementById('sendBtn');
+    const chatBox = document.getElementById('chatBox');
+
+    // UPGRADED: Intelligent Keyword Dictionary (Bypasses API to save quota)
+    const localKnowledge = [
+        {
+            keywords: ["hello", "hi", "hey", "how are you", "mambo", "niaje", "sasa"],
+            answer: "Hello! I am the Smart Tiba AI Assistant. How can I help you today?"
+        },
+        {
+            keywords: ["navigate", "use this site", "where do i go", "guide", "menu", "how to use"],
+            answer: "Navigating is easy! Use the top menu:\n• 'Botanical Scanner' to identify herbs via camera or text.\n• 'Cultivation Guide' for farming advice based on your county.\n• 'Home' to read about our mission."
+        },
+        {
+            keywords: ["contact", "email", "phone", "call", "help", "support", "customer service"],
+            answer: "You can reach our 24/7 support team at lameck.cs16@gmail.com or call us directly at +254 725 713 859."
+        },
+        {
+            keywords: ["scan", "identify", "picture", "photo", "camera", "upload"],
+            answer: "To scan a plant, navigate to the 'Botanical Scanner' page, click 'Use Camera' to take a live photo (or upload an existing image), and hit 'Analyze'."
+        },
+        {
+            keywords: ["cost", "price", "pay", "free", "premium", "subscription"],
+            answer: "Smart Tiba Kenya is currently 100% free to use for local farmers, students, and researchers!"
+        },
+        {
+            keywords: ["password", "forgot", "reset", "login issue", "cant login"],
+            answer: "If you forgot your password or cannot log in, please email lameck.cs16@gmail.com to request a manual account reset."
+        },
+        {
+            keywords: ["who made this", "developer", "creator", "owner", "lameck"],
+            answer: "Smart Tiba Kenya was proudly developed by Lameck Kipsang (Registration: COM/M/0016/2022)."
+        }
+    ];
+
+    function addMessage(text, isUser) {
+        const div = document.createElement('div');
+        div.className = isUser ? 'user-msg' : 'bot-msg';
+        
+        // Format newlines for the bot's responses
+        if (!isUser) {
+            div.innerHTML = text.replace(/\n/g, '<br>');
+        } else {
+            div.innerText = text;
+        }
+        
+        chatBox.appendChild(div);
+        chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    sendBtn.addEventListener('click', async () => {
+        const text = chatInput.value.trim().toLowerCase();
+        const rawText = chatInput.value.trim();
+        if (!text) return;
+        
+        addMessage(rawText, true);
+        chatInput.value = '';
+        
+        // 1. Check local dictionary first using EXACT word boundaries (Fixes the "t-hi-s" bug)
+        let foundLocal = false;
+        for (const item of localKnowledge) {
+            // \\b means "word boundary". It ensures "hi" only matches the exact word "hi", not "this" or "shirt".
+            if (item.keywords.some(kw => new RegExp(`\\b${kw}\\b`, 'i').test(text))) {
+                setTimeout(() => addMessage(item.answer, false), 600); 
+                foundLocal = true;
+                break;
+            }
+        }
+
+        // 2. If not found locally, ask the Gemini API
+        if (!foundLocal) {
+            const typingDiv = document.createElement('div');
+            typingDiv.className = 'bot-msg';
+            typingDiv.innerText = "Let me think about that... 🤔";
+            typingDiv.id = "typingIndicator";
+            chatBox.appendChild(typingDiv);
+            chatBox.scrollTop = chatBox.scrollHeight;
+
+            try {
+                const res = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ message: rawText })
+                });
+                const data = await res.json();
+                document.getElementById('typingIndicator').remove();
+                addMessage(data.reply || data.error, false);
+            } catch (err) {
+                document.getElementById('typingIndicator').remove();
+                addMessage("I am having trouble connecting to the AI brain right now (Quota Exceeded). Please email lameck.cs16@gmail.com for assistance!", false);
+            }
+        }
+    });
+
+    chatInput.addEventListener('keypress', function (e) {
+        if (e.key === 'Enter') sendBtn.click();
+    });
+</script>
+
+<footer>&copy; 2026 Smart Tiba Kenya | 24/7 Support Active</footer>
+</body>
+</html>

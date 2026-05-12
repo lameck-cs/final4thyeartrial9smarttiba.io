@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Tiba Kenya - Cultivation Guide</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="icon" type="image/png" href="logo.png">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+</head>
+<body>
+<header>
+    <img src="logo.png" alt="Smart Tiba Kenya Logo" id="logo">
+    <h1>Smart Tiba Kenya</h1>
+</header>
+
+<nav id="mainNav">
+    <a href="index.html" id="navHome">Home</a>
+    <a href="diagnosis.html" id="navScanner">Botanical Scanner</a>
+    <a href="risk.html" id="navGuide">Cultivation Guide</a>
+    <a href="support.html" id="navSupport">Help & Support</a>
+</nav>
+
+<script>
+    const currentPath = window.location.pathname;
+    if (currentPath.includes('risk.html')) {
+        document.getElementById('navGuide').style.display = 'none';
+    }
+
+    fetch('/api/current_user').then(res => res.json()).then(data => {
+        if(data.logged_in) {
+            const nav = document.getElementById('mainNav');
+            const userText = document.createElement('span');
+            userText.style.color = '#e0ffe0';
+            userText.style.marginLeft = 'auto';
+            userText.style.marginRight = '20px';
+            userText.style.fontWeight = 'bold';
+            userText.innerText = '👤 Welcome, ' + data.username;
+            
+            const logoutBtn = document.createElement('a');
+            logoutBtn.href = '#';
+            logoutBtn.innerText = 'Logout';
+            logoutBtn.onclick = (e) => {
+                e.preventDefault();
+                fetch('/api/logout', {method: 'POST'}).then(() => window.location.href = 'login.html');
+            };
+            nav.appendChild(userText);
+            nav.appendChild(logoutBtn);
+        } else {
+            window.location.href = 'login.html';
+        }
+    });
+</script>
+
+<div class="diagnosis-container">
+    <div class="left-column">
+        <h3>Medicinal Plant Cultivation Guide</h3>
+        <p>Enter a medicinal plant and your county to get commercial growth advice.</p>
+        
+        <label style="display:block; margin-bottom:5px;"><strong>Plant Name:</strong></label>
+        <input type="text" id="cropInput" placeholder="e.g. Aloe Vera, Stinging Nettle">
+        
+        <label style="display:block; margin-top:15px; margin-bottom:5px;"><strong>County:</strong></label>
+        <input type="text" id="countyInput" placeholder="e.g. Kericho, Kisii">
+        
+        <button id="predictBtn" style="width:100%; background-color: #e67e22; margin-top:20px;">Analyze Ecological Viability 📊</button>
+        
+        <div id="loading" style="display:none; text-align:center; margin-top:20px; color:#555;">
+            <p>⏳ Analyzing ecological data...</p>
+        </div>
+    </div>
+    
+    <div class="right-column">
+        <div id="downloadContainer" style="display:none; text-align:right; margin-bottom:10px;">
+            <button onclick="downloadRiskPDF()" style="background:#1565c0; padding:8px 15px;">📥 Download PDF Report</button>
+        </div>
+
+        <div id="pdf-risk-content" style="background:white; padding:20px; border-radius:8px; border: 1px solid #eee;">
+            <h3 style="margin-top:0; color:#e67e22;">Commercial Cultivation Result</h3>
+            <div class="chart-wrapper" style="display:none;">
+                <canvas id="riskChart"></canvas>
+            </div>
+            <div id="riskResult"><p style="color:#777; font-style:italic;">Results will appear here.</p></div>
+        </div>
+    </div>
+</div>
+<footer>&copy; 2026 Smart Tiba Kenya</footer>
+<script src="risk_script.js"></script>
+</body>
+</html>
